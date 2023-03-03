@@ -57,6 +57,7 @@
     <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
     <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
     <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
+    <maven-native-plugin.version>22.3</maven-native-plugin.version>
     <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
     <start-class>tech.jhipster.lite.JHLiteApp</start-class>
 
@@ -537,6 +538,40 @@
       <plugin>
         <groupId>io.github.git-commit-id</groupId>
         <artifactId>git-commit-id-maven-plugin</artifactId>
+      </plugin>
+
+      <!-- Plugin for GraalVM build in docker container and run native tests -->
+      <plugin>
+        <groupId>org.graalvm.buildtools</groupId>
+        <artifactId>native-maven-plugin</artifactId>
+        <!-- use the recommended JUnit Platform test listener mode -->
+        <extensions>true</extensions>
+        <configuration>
+          <metadataRepository>
+            <enabled>true</enabled>
+          </metadataRepository>
+          <requiredVersion>${maven-native-plugin.version}</requiredVersion>
+          <buildArgs>
+            <!-- build standalone image -->
+            <buildArg>--no-fallback</buildArg>
+            <!-- avoid errors of unresolved type during parsing -->
+            <buildArg>--allow-incomplete-classpath</buildArg>
+            <!-- allow HTTP and HTTPS -->
+            <buildArg>-H:EnableURLProtocols=http,https</buildArg>
+            <buildArg>--enable-all-security-services</buildArg>
+            <!-- to be able to run native tests -->
+            <!--<buildArg>static</buildArg>
+            <buildArg>initialize-at-build-time=io.cucumber.core,io.cucumber.gherkin,org.junit.jupiter.api,io.cucumber.junitxmlformatter,java.io.FileOutputStream</buildArg>-->
+          </buildArgs>
+        </configuration>
+        <executions>
+          <execution>
+            <id>add-reachability-metadata</id>
+            <goals>
+              <goal>add-reachability-metadata</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
     <pluginManagement>
